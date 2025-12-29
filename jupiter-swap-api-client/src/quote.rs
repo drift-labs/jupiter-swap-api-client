@@ -5,6 +5,7 @@ use std::{collections::HashMap, str::FromStr};
 
 use crate::route_plan_with_metadata::RoutePlanWithMetadata;
 use crate::serde_helpers::field_as_string;
+use crate::serde_helpers::option_field_as_string;
 use anyhow::{anyhow, Error};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -38,6 +39,13 @@ pub struct SwapInfo {
     /// Estimated output amount from the AMM pool (factoring in token decimals).
     #[serde(with = "field_as_string")]
     pub out_amount: u64,
+    /// DEPRECATED: The fee amount for the AMM swap (now optional since Jupiter API deprecated this field).
+    /// The `out_amount` already factors in these fees.
+    #[serde(default, with = "option_field_as_string")]
+    pub fee_amount: Option<u64>,
+    /// DEPRECATED: The fee mint for the AMM swap (now optional since Jupiter API deprecated this field).
+    #[serde(default, with = "option_field_as_string")]
+    pub fee_mint: Option<Pubkey>,
 }
 
 // --- Swap Mode Enumeration ---
