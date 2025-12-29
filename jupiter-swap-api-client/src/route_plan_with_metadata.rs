@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use solana_pubkey::Pubkey;
 
 use crate::serde_helpers::field_as_string;
+use crate::serde_helpers::option_field_as_string;
 
 /// Topologically sorted DAG with additional metadata for rendering
 pub type RoutePlanWithMetadata = Vec<RoutePlanStep>;
@@ -29,8 +30,10 @@ pub struct SwapInfo {
     /// An estimation of the output amount into the AMM
     #[serde(with = "field_as_string")]
     pub out_amount: u64,
-    #[serde(with = "field_as_string")]
-    pub fee_amount: u64,
-    #[serde(with = "field_as_string")]
-    pub fee_mint: Pubkey,
+    /// DEPRECATED: The fee amount for the AMM swap (now optional since Jupiter API deprecated this field).
+    #[serde(default, with = "option_field_as_string")]
+    pub fee_amount: Option<u64>,
+    /// DEPRECATED: The fee mint for the AMM swap (now optional since Jupiter API deprecated this field).
+    #[serde(default, with = "option_field_as_string")]
+    pub fee_mint: Option<Pubkey>,
 }
