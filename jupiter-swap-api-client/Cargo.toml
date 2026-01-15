@@ -15,4 +15,4 @@ solana-account-decoder = { workspace = true }
 thiserror = "2"
 base64 = "0.22"
 reqwest = { version = "0.12", features = ["json"] }
-rust_decimal = "1.36"
+rust_decimal = { version = "1.40", default-features = false, features = ["serde", "maths"] }
