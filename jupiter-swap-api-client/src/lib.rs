@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use quote::{InternalQuoteRequest, QuoteRequest, QuoteResponse};
-use reqwest::{Client, Response};
+use reqwest::{header::HeaderMap, Client, Response};
 use serde::de::DeserializeOwned;
 use swap::{SwapInstructionsResponse, SwapInstructionsResponseInternal, SwapRequest, SwapResponse};
 use thiserror::Error;
@@ -15,6 +15,8 @@ pub mod transaction_config;
 #[derive(Clone)]
 pub struct JupiterSwapApiClient {
     pub base_path: String,
+    /// Optional API key for authenticated requests (required for api.jup.ag)
+    pub api_key: Option<String>,
 }
 
 #[derive(Debug, Error)]
@@ -49,7 +51,30 @@ async fn check_status_code_and_deserialize<T: DeserializeOwned>(
 
 impl JupiterSwapApiClient {
     pub fn new(base_path: String) -> Self {
-        Self { base_path }
+        Self {
+            base_path,
+            api_key: None,
+        }
+    }
+
+    /// Create a new client with an API key for authenticated requests
+    pub fn new_with_api_key(base_path: String, api_key: String) -> Self {
+        Self {
+            base_path,
+            api_key: Some(api_key),
+        }
+    }
+
+    /// Build default headers including API key if present
+    fn default_headers(&self) -> HeaderMap {
+        let mut headers = HeaderMap::new();
+        if let Some(ref api_key) = self.api_key {
+            headers.insert(
+                "x-api-key",
+                api_key.parse().expect("valid header value"),
+            );
+        }
+        headers
     }
 
     pub async fn quote(&self, quote_request: &QuoteRequest) -> Result<QuoteResponse, ClientError> {
@@ -58,6 +83,7 @@ impl JupiterSwapApiClient {
         let internal_quote_request = InternalQuoteRequest::from(quote_request.clone());
         let response = Client::new()
             .get(url)
+            .headers(self.default_headers())
             .query(&internal_quote_request)
             .query(&extra_args)
             .send()
@@ -72,6 +98,7 @@ impl JupiterSwapApiClient {
     ) -> Result<SwapResponse, ClientError> {
         let response = Client::new()
             .post(format!("{}/swap", self.base_path))
+            .headers(self.default_headers())
             .query(&extra_args)
             .json(swap_request)
             .send()
@@ -85,6 +112,7 @@ impl JupiterSwapApiClient {
     ) -> Result<SwapInstructionsResponse, ClientError> {
         let response = Client::new()
             .post(format!("{}/swap-instructions", self.base_path))
+            .headers(self.default_headers())
             .json(swap_request)
             .send()
             .await?;
