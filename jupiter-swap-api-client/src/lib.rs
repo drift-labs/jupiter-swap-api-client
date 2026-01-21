@@ -69,10 +69,7 @@ impl JupiterSwapApiClient {
     fn default_headers(&self) -> HeaderMap {
         let mut headers = HeaderMap::new();
         if let Some(ref api_key) = self.api_key {
-            headers.insert(
-                "x-api-key",
-                api_key.parse().expect("valid header value"),
-            );
+            headers.insert("x-api-key", api_key.parse().expect("valid header value"));
         }
         headers
     }

@@ -1631,7 +1631,6 @@ dependencies = [
  "rust_decimal",
  "serde",
  "serde_json",
- "serde_qs",
  "solana-account-decoder",
  "solana-instruction",
  "solana-pubkey 3.0.0",
@@ -2798,17 +2797,6 @@ dependencies = [
  "serde",
  "serde_core",
  "zmij",
-]
-
-[[package]]
-name = "serde_qs"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cd34f36fe4c5ba9654417139a9b3a20d2e1de6012ee678ad14d240c22c78d8d6"
-dependencies = [
- "percent-encoding",
- "serde",
- "thiserror 1.0.69",
 ]
 
 [[package]]
